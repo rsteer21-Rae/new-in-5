@@ -125,4 +125,4 @@ jobs:
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
           uses-non-exempt-encryption: "false"
           wait-for-processing: "false"
-          backend: AppStoreAPI
+          backend: altool
