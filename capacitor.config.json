@@ -1,0 +1,8 @@
+{
+  "appId": "com.newinfive.app",
+  "appName": "New in 5",
+  "webDir": "www",
+  "server": {
+    "iosScheme": "https"
+  }
+}
