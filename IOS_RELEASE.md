@@ -8,7 +8,6 @@ to TestFlight.
 
 - `APPSTORE_CERTIFICATES_FILE_BASE64` — base64-encoded Apple Distribution `.p12`
 - `APPSTORE_CERTIFICATES_PASSWORD` — password used when exporting the `.p12`
-- `APPSTORE_PROVISIONING_PROFILE_BASE64` — base64-encoded App Store provisioning profile
 - `APPSTORE_API_PRIVATE_KEY` — contents of the App Store Connect API `.p8` key
 
 ## GitHub Actions variables
