@@ -1,0 +1,83 @@
+name: Apple Signing Assistant
+
+on:
+  workflow_dispatch:
+    inputs:
+      common_name:
+        description: Name shown on the certificate request
+        required: true
+        default: New in 5 Distribution
+
+permissions:
+  contents: read
+
+jobs:
+  create-signing-request:
+    runs-on: macos-15
+    timeout-minutes: 10
+    env:
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+    steps:
+      - name: Check signing password
+        run: |
+          if [ ${#SIGNING_KEY_PASSWORD} -lt 16 ]; then
+            echo "SIGNING_KEY_PASSWORD must exist and contain at least 16 characters."
+            exit 1
+          fi
+
+      - name: Generate encrypted private key and Apple CSR
+        env:
+          CERTIFICATE_COMMON_NAME: ${{ inputs.common_name }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/apple-signing-request"
+          cd "$RUNNER_TEMP/apple-signing-request"
+
+          openssl genpkey \
+            -algorithm RSA \
+            -aes-256-cbc \
+            -pass env:SIGNING_KEY_PASSWORD \
+            -pkeyopt rsa_keygen_bits:2048 \
+            -out new-in-5-distribution-encrypted.key
+
+          openssl req \
+            -new \
+            -sha256 \
+            -key new-in-5-distribution-encrypted.key \
+            -passin env:SIGNING_KEY_PASSWORD \
+            -subj "/CN=$CERTIFICATE_COMMON_NAME/O=Apple Team 375N4QJ87J" \
+            -out new-in-5-distribution.csr
+
+          openssl req \
+            -in new-in-5-distribution.csr \
+            -noout \
+            -verify
+
+          cat > README.txt <<'EOF'
+          Keep every file in this artifact. Upload new-in-5-distribution.csr
+          when Apple asks for a Certificate Signing Request. The encrypted
+          private key is required later to create the .p12 certificate.
+
+          Do not commit these files to the repository or share them.
+          EOF
+
+      - name: Upload signing request artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: apple-signing-request-${{ github.run_id }}
+          path: ${{ runner.temp }}/apple-signing-request
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Add next steps to workflow summary
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Apple signing request created
+
+          1. Download **apple-signing-request-${GITHUB_RUN_ID}** from this run's Artifacts section.
+          2. Keep the encrypted private key safe.
+          3. Upload **new-in-5-distribution.csr** when creating an Apple Distribution certificate.
+          4. Download Apple's **distribution.cer** file.
+
+          Run ID for the next signing stage: **${GITHUB_RUN_ID}**
+          EOF
