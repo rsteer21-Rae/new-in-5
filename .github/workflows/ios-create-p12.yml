@@ -1,0 +1,106 @@
+name: Create Apple Distribution P12
+
+on:
+  workflow_dispatch:
+    inputs:
+      signing_request_run_id:
+        description: Run ID from Apple Signing Assistant
+        required: true
+        default: "29485600436"
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  create-p12:
+    runs-on: macos-15
+    timeout-minutes: 10
+    env:
+      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      P12_PASSWORD: ${{ secrets.APPSTORE_CERTIFICATES_PASSWORD }}
+      CERTIFICATE_BASE64: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE_CER_BASE64 }}
+
+    steps:
+      - name: Check required secrets
+        run: |
+          if [ ${#SIGNING_KEY_PASSWORD} -lt 16 ]; then
+            echo "SIGNING_KEY_PASSWORD is missing or too short."
+            exit 1
+          fi
+          if [ ${#P12_PASSWORD} -lt 16 ]; then
+            echo "APPSTORE_CERTIFICATES_PASSWORD is missing or too short."
+            exit 1
+          fi
+          if [ -z "$CERTIFICATE_BASE64" ]; then
+            echo "APPLE_DISTRIBUTION_CERTIFICATE_CER_BASE64 is missing."
+            exit 1
+          fi
+
+      - name: Download encrypted signing request
+        uses: actions/download-artifact@v4
+        with:
+          name: apple-signing-request-${{ inputs.signing_request_run_id }}
+          path: ${{ runner.temp }}/signing-request
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ inputs.signing_request_run_id }}
+
+      - name: Create password-protected P12
+        run: |
+          mkdir -p "$RUNNER_TEMP/p12-output"
+          echo "$CERTIFICATE_BASE64" | base64 --decode > "$RUNNER_TEMP/distribution.cer"
+
+          if openssl x509 -inform DER -in "$RUNNER_TEMP/distribution.cer" \
+            -out "$RUNNER_TEMP/distribution.pem" 2>/dev/null; then
+            echo "Decoded DER Apple certificate."
+          else
+            openssl x509 -inform PEM -in "$RUNNER_TEMP/distribution.cer" \
+              -out "$RUNNER_TEMP/distribution.pem"
+          fi
+
+          openssl x509 -in "$RUNNER_TEMP/distribution.pem" -noout -subject -issuer -dates
+
+          openssl pkcs12 -export \
+            -inkey "$RUNNER_TEMP/signing-request/new-in-5-distribution-encrypted.key" \
+            -passin env:SIGNING_KEY_PASSWORD \
+            -in "$RUNNER_TEMP/distribution.pem" \
+            -name "New in 5 Distribution" \
+            -out "$RUNNER_TEMP/p12-output/new-in-5-distribution.p12" \
+            -passout env:P12_PASSWORD
+
+          openssl pkcs12 \
+            -in "$RUNNER_TEMP/p12-output/new-in-5-distribution.p12" \
+            -passin env:P12_PASSWORD \
+            -noout -info 2>&1 | grep -v "MAC:"
+
+          base64 -i "$RUNNER_TEMP/p12-output/new-in-5-distribution.p12" \
+            -o "$RUNNER_TEMP/p12-output/APPSTORE_CERTIFICATES_FILE_BASE64.txt"
+
+          cat > "$RUNNER_TEMP/p12-output/README.txt" <<'EOF'
+          Copy the entire contents of APPSTORE_CERTIFICATES_FILE_BASE64.txt into
+          the GitHub Actions secret APPSTORE_CERTIFICATES_FILE_BASE64.
+
+          The .p12 password is the value already stored in the
+          APPSTORE_CERTIFICATES_PASSWORD secret.
+          EOF
+
+      - name: Upload P12 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-in-5-distribution-p12-${{ github.run_id }}
+          path: ${{ runner.temp }}/p12-output
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Add next steps to workflow summary
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<EOF
+          ## Distribution P12 created
+
+          Download **new-in-5-distribution-p12-${GITHUB_RUN_ID}** immediately.
+          Copy the Base64 text file into the GitHub secret
+          **APPSTORE_CERTIFICATES_FILE_BASE64**.
+
+          This artifact expires after one day.
+          EOF
