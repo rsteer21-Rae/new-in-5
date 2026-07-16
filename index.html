@@ -218,9 +218,38 @@
       gap: 6px;
     }
 
-    .greeting { margin: 6px 5px 23px; }
+    .greeting { margin: 6px 5px 14px; }
     .greeting .kicker { color: var(--muted); font-size: 12px; font-weight: 850; margin-bottom: 7px; letter-spacing: .2px; }
     .greeting h2 { margin: 0; font-size: 28px; letter-spacing: -1.3px; line-height: 1.14; }
+
+    .subject-picker { margin: 0 -2px 17px; }
+    .subject-picker-label { display:block; margin:0 7px 7px; color:var(--muted); font-size:11px; font-weight:900; letter-spacing:.2px; }
+    .subject-chips {
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding:2px 5px 6px;
+      scrollbar-width:none;
+      scroll-snap-type:x proximity;
+      -webkit-overflow-scrolling:touch;
+    }
+    .subject-chips::-webkit-scrollbar { display:none; }
+    .subject-chip {
+      flex:0 0 auto;
+      scroll-snap-align:start;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:9px 12px;
+      background:rgba(255,253,248,.86);
+      color:var(--navy);
+      font:inherit;
+      font-size:11px;
+      font-weight:900;
+      cursor:pointer;
+      transition:background .16s ease, color .16s ease, transform .16s ease;
+    }
+    .subject-chip:active { transform:scale(.96); }
+    .subject-chip.active { background:var(--navy); color:white; border-color:var(--navy); box-shadow:0 7px 16px rgba(23,36,61,.15); }
 
     .card-deck {
       position: relative;
@@ -628,6 +657,18 @@
             <h2 id="homeGreeting">Here’s something surprising.</h2>
           </div>
 
+          <div class="subject-picker" aria-label="Choose a subject">
+            <span class="subject-picker-label">What do you feel like learning?</span>
+            <div class="subject-chips">
+              <button class="subject-chip active" data-subject="Surprise" aria-pressed="true">✦ Surprise</button>
+              <button class="subject-chip" data-subject="History" aria-pressed="false">◴ History</button>
+              <button class="subject-chip" data-subject="Science" aria-pressed="false">⌁ Science</button>
+              <button class="subject-chip" data-subject="Space" aria-pressed="false">✦ Space</button>
+              <button class="subject-chip" data-subject="Nature" aria-pressed="false">⌇ Nature</button>
+              <button class="subject-chip" data-subject="Future" aria-pressed="false">↗ Future</button>
+            </div>
+          </div>
+
           <div class="card-deck" id="homeDeck">
             <article class="fact-card" id="factCard" aria-label="Swipe this learning card left or right for another topic">
               <div class="label-row">
@@ -1016,6 +1057,7 @@
     let saved = new Set();
     let answered = false;
     let motionLocked = false;
+    let activeSubject = "Surprise";
 
     const $ = (id) => document.getElementById(id);
     const screens = [...document.querySelectorAll(".screen")];
@@ -1097,6 +1139,11 @@
       $("modeName").textContent = titleCase(readingMode);
       $("surpriseButton").textContent = "or tap to shuffle · " + lessons.length + " ideas";
       document.querySelectorAll(".mode-label").forEach(e => e.textContent = titleCase(readingMode));
+      document.querySelectorAll(".subject-chip").forEach(button => {
+        const active = button.dataset.subject === activeSubject;
+        button.classList.toggle("active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
     }
 
     function renderLesson() {
@@ -1148,6 +1195,7 @@
         </button>`).join("");
       document.querySelectorAll(".saved-card").forEach(btn => btn.addEventListener("click", () => {
         currentLessonIndex = lessons.findIndex(l => l.id === btn.dataset.id);
+        activeSubject = lesson().category === "The future" ? "Future" : lesson().category;
         renderHome(); showScreen("homeScreen", true);
       }));
     }
@@ -1196,10 +1244,35 @@
       }, 220);
     }
 
+    function lessonPool(subject = activeSubject) {
+      const target = subject === "Future" ? "The future" : subject;
+      return lessons
+        .map((item, index) => ({ item, index }))
+        .filter(({ item }) => subject === "Surprise" || item.category === target)
+        .map(({ index }) => index);
+    }
+
+    function advanceLesson(delta = 1) {
+      const pool = lessonPool();
+      const position = pool.indexOf(currentLessonIndex);
+      const nextPosition = position < 0 ? 0 : (position + delta + pool.length) % pool.length;
+      currentLessonIndex = pool[nextPosition];
+    }
+
+    function chooseSubject(subject, announce = true) {
+      activeSubject = subject;
+      const pool = lessonPool(subject);
+      const alternatives = pool.length > 1 ? pool.filter(index => index !== currentLessonIndex) : pool;
+      currentLessonIndex = alternatives[Math.floor(Math.random() * alternatives.length)];
+      renderHome();
+      showScreen("homeScreen", true);
+      if (announce) toast(subject === "Surprise" ? "Surprise picked" : (subject === "Future" ? "Future outlook selected" : subject + " selected"));
+    }
+
     function cycleHomeCard(delta = 1) {
       const side = delta > 0 ? "left" : "right";
       throwCard($("factCard"), side, () => {
-        currentLessonIndex = (currentLessonIndex + delta + lessons.length) % lessons.length;
+        advanceLesson(delta);
         renderHome();
         toast(lesson().kind === "outlook" ? "Evidence-based outlook" : lesson().category + " · verified");
       });
@@ -1318,20 +1391,10 @@
       $("finishButton").style.opacity = "1";
     });
     $("finishButton").addEventListener("click", () => { $("recapText").textContent = lesson().recap; showScreen("completeScreen", false); });
-    $("anotherButton").addEventListener("click", () => { currentLessonIndex = (currentLessonIndex + 1) % lessons.length; renderHome(); showScreen("homeScreen", true); });
+    $("anotherButton").addEventListener("click", () => { advanceLesson(1); renderHome(); showScreen("homeScreen", true); });
     document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("click", () => { if (item.dataset.screen === "savedScreen") renderSaved(); showScreen(item.dataset.screen, true); }));
-    document.querySelectorAll(".category-card[data-category]").forEach(btn => btn.addEventListener("click", () => {
-      const requested = btn.dataset.category;
-      const target = requested === "Future" ? "The future" : requested;
-      const matches = lessons
-        .map((item, index) => ({ item, index }))
-        .filter(({ item }) => requested === "Surprise" || item.category === target)
-        .map(({ index }) => index);
-      const alternatives = matches.length > 1 ? matches.filter(index => index !== currentLessonIndex) : matches;
-      currentLessonIndex = alternatives[Math.floor(Math.random() * alternatives.length)];
-      renderHome(); showScreen("homeScreen", true);
-      toast(requested === "Surprise" ? "Surprise picked" : target + " selected");
-    }));
+    document.querySelectorAll(".subject-chip[data-subject]").forEach(btn => btn.addEventListener("click", () => chooseSubject(btn.dataset.subject)));
+    document.querySelectorAll(".category-card[data-category]").forEach(btn => btn.addEventListener("click", () => chooseSubject(btn.dataset.category)));
 
     enableSwipe($("factCard"), () => cycleHomeCard(1), () => cycleHomeCard(-1));
     enableSwipe($("lessonCard"), () => cycleLessonCard(1), () => cycleLessonCard(-1));
