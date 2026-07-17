@@ -314,8 +314,75 @@
       margin: 15px 0 13px;
       display: grid;
       place-items: center;
+      position: relative;
+      z-index: 0;
+      flex-shrink: 0;
+      overflow: hidden;
+      border-radius: 24px;
+      background: rgba(255,253,248,.38);
     }
-    .hero-art svg { width: 100%; height: 100%; overflow: visible; }
+    .hero-art svg { width: 100%; height: 100%; overflow: hidden; }
+
+    .subject-visual {
+      width: 100%;
+      height: 100%;
+      min-height: 74px;
+      position: relative;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+    .subject-visual::before {
+      content: "";
+      position: absolute;
+      width: min(54%, 160px);
+      aspect-ratio: 1.55;
+      border-radius: 46% 54% 58% 42% / 55% 43% 57% 45%;
+      background: var(--visual-soft, #e4f3ea);
+      border: 2px solid rgba(23,36,61,.12);
+      transform: rotate(-5deg);
+      z-index: -1;
+    }
+    .visual-pair {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(8px, 3vw, 22px);
+      transform: translateY(-5px);
+    }
+    .visual-main, .visual-detail {
+      display: grid;
+      place-items: center;
+      line-height: 1;
+      filter: drop-shadow(0 4px 4px rgba(23,36,61,.12));
+    }
+    .visual-main { font-size: clamp(44px, 7vh, 68px); }
+    .visual-detail { font-size: clamp(27px, 4.6vh, 44px); }
+    .visual-arrow {
+      color: var(--visual-accent, #69bc98);
+      font-size: clamp(20px, 4vh, 32px);
+      font-weight: 950;
+      line-height: 1;
+    }
+    .visual-cue {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      transform: translateX(-50%);
+      max-width: 90%;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: rgba(255,253,248,.9);
+      border: 1px solid rgba(23,36,61,.08);
+      color: var(--navy);
+      font-size: clamp(8px, 1.5vh, 10px);
+      font-weight: 950;
+      letter-spacing: .45px;
+      line-height: 1.1;
+      text-align: center;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
 
     .fact-card h3 {
       margin: 3px 0 12px;
@@ -593,7 +660,7 @@
       #homeScreen { display:flex; flex-direction:column; }
       .card-deck { flex:1 1 auto; min-height:0; }
       .fact-card { height:100%; min-height:0; padding:clamp(14px, 2.3dvh, 22px); }
-      .hero-art { flex:1 1 auto; min-height:62px; height:auto; max-height:clamp(105px, 23dvh, 190px); margin:clamp(6px, 1.2dvh, 13px) 0; }
+      .hero-art { flex:0 0 clamp(105px, 17dvh, 155px); min-height:105px; height:auto; max-height:155px; margin:clamp(6px, 1.2dvh, 13px) 0; }
       .fact-card h3 { margin:2px 0 clamp(6px, 1dvh, 10px); font-size:clamp(19px, 3.3dvh, 26px); }
       .fact-card p { font-size:clamp(12px, 1.85dvh, 14px); line-height:1.4; }
       .meta { margin:clamp(7px, 1.3dvh, 14px) 0; }
@@ -618,25 +685,31 @@
       .lesson-stage { flex:1 1 auto; min-height:0; padding-top:clamp(9px, 1.7dvh, 17px); }
       .lesson-stage::before { top:24px; bottom:-5px; }
       .lesson-card { height:100%; min-height:0; max-height:none; overflow:hidden; padding:clamp(14px, 2.4dvh, 22px); }
-      .lesson-art { flex:1 1 38%; min-height:70px; height:auto; max-height:225px; }
+      .lesson-art { flex:0 0 clamp(120px, 24dvh, 205px); min-height:120px; height:auto; max-height:205px; }
       .lesson-copy { flex:0 1 auto; padding:clamp(9px, 1.8dvh, 20px) 4px clamp(6px, 1.2dvh, 13px); }
       .lesson-eyebrow { margin-bottom:clamp(5px, .9dvh, 9px); }
       .lesson-copy h2 { margin-bottom:clamp(6px, 1.1dvh, 12px); font-size:clamp(20px, 3.5dvh, 28px); }
       .lesson-copy p { font-size:clamp(12px, 1.9dvh, 15px); line-height:1.42; }
       .swipe-hint.lesson-swipe { margin:clamp(4px, .8dvh, 10px) 0; }
       .text-link { padding:clamp(7px, 1.2dvh, 11px); }
-      .fact-card.fit-compact .hero-art { max-height:88px; }
+      .fact-card.fit-compact .hero-art { flex-basis:88px; min-height:88px; max-height:88px; }
+      .fact-card.fit-compact .visual-main, .lesson-card.fit-compact .visual-main { font-size:46px; }
+      .fact-card.fit-compact .visual-detail, .lesson-card.fit-compact .visual-detail { font-size:29px; }
       .fact-card.fit-compact h3 { font-size:18px; line-height:1.06; }
       .fact-card.fit-compact p { font-size:11.5px; line-height:1.32; }
       .fact-card.fit-compact .meta { margin:5px 0; }
-      .fact-card.fit-tight .hero-art { display:none; }
+      .fact-card.fit-tight .hero-art { display:grid; flex-basis:74px; min-height:74px; max-height:74px; margin:4px 0; }
+      .fact-card.fit-tight .visual-main, .lesson-card.fit-tight .visual-main { font-size:35px; }
+      .fact-card.fit-tight .visual-detail, .lesson-card.fit-tight .visual-detail { font-size:23px; }
+      .fact-card.fit-tight .visual-cue, .lesson-card.fit-tight .visual-cue { font-size:7px; padding:3px 7px; }
+      .fact-card.fit-tight .meta { display:none; }
       .fact-card.fit-tight { padding:12px; }
-      .lesson-card.fit-compact .lesson-art { max-height:95px; }
+      .lesson-card.fit-compact .lesson-art { flex-basis:95px; min-height:95px; max-height:95px; }
       .lesson-card.fit-compact .lesson-copy { padding:7px 4px 5px; }
       .lesson-card.fit-compact .lesson-copy h2 { font-size:18px; margin-bottom:5px; }
       .lesson-card.fit-compact .lesson-copy p { font-size:11.5px; line-height:1.32; }
       .lesson-card.fit-compact .swipe-hint { display:none; }
-      .lesson-card.fit-tight .lesson-art { display:none; }
+      .lesson-card.fit-tight .lesson-art { display:grid; flex-basis:78px; min-height:78px; max-height:78px; }
       .lesson-card.fit-tight { padding:12px; }
       .lesson-card.fit-tight .text-link { padding:5px; }
 
@@ -670,7 +743,7 @@
       .greeting .kicker, .trust-note, #homeScreen > .swipe-hint, .swipe-hint.lesson-swipe { display:none; }
       .greeting h2 { font-size:19px; }
       .subject-chips { padding-bottom:3px; }
-      .hero-art { max-height:90px; }
+      .hero-art { flex-basis:82px; min-height:82px; max-height:82px; }
       .fact-card h3 { font-size:18px; line-height:1.05; }
       .meta { margin:5px 0; }
       .lesson-copy h2 { font-size:19px; }
@@ -1155,30 +1228,136 @@
         </svg>`;
     }
 
-    function topicArt(category, step = 0) {
+    const factVisuals = {
+      "venus-hottest": ["🟠", "🌡️", "467°C surface", "›"],
+      "venus-backwards": ["🟠", "☀️", "Sunrise in the west", "↶"],
+      "venus-long-day": ["🟠", "🕰️", "243d spin • 225d year", "↔"],
+      "mercury-smallest": ["🪨", "🌕", "Planet ≈ our Moon", "↔"],
+      "mercury-sunlight": ["🪨", "☀️", "Up to 7× brighter", "‹"],
+      "jupiter-short-day": ["🪐", "⏱️", "9.9-hour day", "›"],
+      "jupiter-volume": ["🪐", "🌍", "≈ 1,000 Earths", "×"],
+      "saturn-float": ["🪐", "🌊", "Less dense than water", "↕"],
+      "saturn-year": ["🪐", "🗓️", "29.4 Earth years", "›"],
+      "uranus-sideways": ["🔵", "↪️", "98° axial tilt", "↷"],
+      "neptune-winds": ["🔵", "💨", "> 2,000 km/h", "›"],
+      "mars-volcano": ["🔴", "🌋", "Olympus Mons", "›"],
+      "mars-day": ["🔴", "🕰️", "24h 39m", "›"],
+      "phobos-orbits": ["🔴", "🌕", "3 orbits per sol", "↻"],
+      "phobos-future": ["🔴", "💫", "A possible future ring", "→"],
+      "moon-far-side": ["🌕", "☀️", "Far side gets sunlight", "↔"],
+      "moon-same-face": ["🌕", "↻", "1 spin per orbit", "="],
+      "moon-distance": ["🌍", "🌕", "≈ 30 Earth-widths", "↔"],
+      "titan-lakes": ["🌕", "💧", "Methane lakes", "›"],
+      "enceladus-plumes": ["🧊", "⛲", "Ocean plumes", "↑"],
+      "europa-ocean": ["🧊", "🌊", "Ocean beneath the ice", "↓"],
+      "pluto-mountains": ["⚪", "🏔️", "Water-ice mountains", "›"],
+      "sun-mass": ["☀️", "⚖️", "99.8% of system mass", "="],
+      "sun-light-time": ["☀️", "🌍", "8m 20s light travel", "→"],
+      "sun-volume": ["☀️", "🌍", "≈ 1.3m Earths", "×"],
+
+      "cephalopod-hearts": ["🐙", "♥️♥️♥️", "Three hearts", "›"],
+      "cephalopod-blue-blood": ["🐙", "💧", "Copper-based blue blood", "›"],
+      "octopus-squeeze": ["🐙", "🕳️", "Soft body • hard beak", "→"],
+      "octopus-two-arms": ["🐙", "🦵", "Walking on two arms", "›"],
+      "giant-squid-length": ["🦑", "📏", "Nearly 13 metres", "↔"],
+      "whale-land-ancestors": ["🐾", "🐋", "Land mammal → whale", "→"],
+      "whale-tail": ["🐋", "↕️", "Tail moves up and down", "›"],
+      "sperm-whale-brain": ["🐋", "🧠", "Largest animal brain", "›"],
+      "dolphin-half-sleep": ["🐬", "😴", "Half the brain rests", "½"],
+      "baleen-keratin": ["🐋", "💅", "Keratin filtering plates", "="],
+      "blue-whale-krill": ["🐋", "🦐", "≈ 1 tonne per day", "›"],
+      "whale-earwax": ["🐋", "📜", "Layers record a life", "›"],
+      "whale-leg-bones": ["🐋", "🦴", "Tiny hind-limb remnants", "›"],
+      "sloth-weekly": ["🦥", "🗓️", "Sometimes once a week", "›"],
+      "sloth-digestion": ["🦥", "🍃", "About a month", "›"],
+      "sloth-swim": ["🦥", "🌊", "A capable swimmer", "→"],
+      "sloth-algae": ["🦥", "🌿", "A fur ecosystem", "＋"],
+      "flamingo-food-colour": ["🦩", "🦐", "Food supplies pigment", "←"],
+      "flamingo-chicks": ["🐣", "🦩", "Grey chick → pink adult", "→"],
+      "flamingo-feeding": ["🦩", "🙃", "Head upside down", "↷"],
+      "flamingo-parents": ["🦩🦩", "🥚", "Parents share care", "＋"],
+      "mosquito-females": ["🦟", "♀", "Only females bite", "›"],
+      "mosquito-water": ["🦟", "💧", "Life begins in water", "←"],
+      "crow-faces": ["🐦‍⬛", "🙂", "Remembers human faces", "›"],
+      "tardigrade-space": ["🦠", "🚀", "Survived space exposure", "→"],
+
+      "ocean-cover": ["🌍", "🌊", "71% ocean", "="],
+      "ocean-water": ["💧", "🌊", "97% in the ocean", "="],
+      "one-ocean": ["🌍", "🌊", "One connected ocean", "↔"],
+      "sea-versus-ocean": ["🏝️", "🌊", "Sea: more enclosed", "↔"],
+      "sargasso-sea": ["🌿", "🌊", "Bounded by currents", "◎"],
+      "ice-density": ["🧊", "🌊", "Ice is ≈ 9% less dense", "↑"],
+      "iceberg-tip": ["🧊", "🌊", "≈ 10% above water", "↕"],
+      "water-four-degrees": ["💧", "🌡️", "Densest near 4°C", "="],
+      "water-expands": ["💧", "🧊", "Water expands on freezing", "→"],
+      "freeze-thaw": ["🧊", "🪨", "Freezing splits rock", "→"],
+      "yellowstone-half": ["🏞️", "⛲", "> Half of active geysers", "›"],
+      "yellowstone-features": ["🏞️", "♨️", "> 10,000 features", "›"],
+      "yellowstone-geysers": ["🏞️", "⛲", "> 500 geysers", "›"],
+      "old-faithful-not-most": ["⛲", "🏆", "Famous, not the largest", "≠"],
+      "old-faithful-interval": ["⛲", "⏱️", "≈ 90-minute average", "›"],
+      "steamboat-geyser": ["⛲", "📏", "> 90 metres", "↑"],
+      "earth-bulge": ["🌍", "↔️", "Wider at the equator", "›"],
+      "earth-day": ["🌍", "↻", "≈ 23.9-hour rotation", "="],
+      "earth-year": ["🌍", "🗓️", "≈ 365.25 days", "="],
+      "earth-atmosphere": ["🌍", "💨", "78% N₂ • 21% O₂", "›"],
+      "earth-magnetic-field": ["🌍", "🧲", "Liquid core dynamo", "←"],
+      "tectonic-plates": ["🌍", "🧩", "Moving crustal plates", "›"],
+      "brain-energy": ["🧠", "⚡", "≈ 20% resting energy", "›"],
+      "cornea-blood-vessels": ["👁️", "🩸", "Clear • no vessels", "∅"],
+      "gut-renewal": ["🧬", "♻️", "Gut lining • ≈ 5 days", "›"],
+
+      "liberty-brown": ["🗽", "🟤", "Original copper colour", "←"],
+      "liberty-patina": ["🗽", "🟢", "≈ 30 years to turn green", "→"],
+      "liberty-thin-copper": ["🗽", "🪙", "≈ 2.5 mm copper", "="],
+      "liberty-height": ["🗽", "📏", "93 m ground to torch", "↕"],
+      "liberty-facing": ["🗽", "🧭", "Faces south-east", "↘"],
+      "liberty-second-torch": ["🗽", "🔥", "Replacement torch", "②"],
+      "liberty-full-name": ["🗽", "📜", "Liberty Enlightening the World", "›"],
+      "liberty-tablet": ["🗽", "📕", "JULY IV MDCCLXXVI", "›"],
+      "liberty-chains": ["🗽", "⛓️‍💥", "Broken shackles at her feet", "↓"],
+      "liberty-tallest": ["🗽", "🏙️", "NYC's tallest in 1886", "↑"],
+      "apollo-date": ["🌕", "🚀", "20 July 1969", "›"],
+      "apollo-three": ["👨‍🚀👨‍🚀👨‍🚀", "🌕", "3 crew • 2 landed", "2"],
+      "apollo-first-steps": ["👨‍🚀", "👣", "Armstrong, then Aldrin", "→"],
+      "apollo-samples": ["🌕", "🪨", "21.5 kg returned", "→"],
+      "apollo-names": ["🚀", "🦅", "Columbia • Eagle", "＋"],
+      "pyramid-date": ["🔺", "🗓️", "Built ≈ 4,500 years ago", "›"],
+      "cleopatra-birth": ["👑", "🗓️", "Born 70 or 69 BC", "›"],
+      "cleopatra-reign": ["👑", "🏺", "Ruled 51–30 BC", "›"],
+      "nintendo-cards": ["🎴", "🗓️", "Playing cards • 1889", "›"],
+      "nintendo-name": ["🎴", "🏢", "Company name • 1963", "→"],
+      "nintendo-home-games": ["🎮", "📺", "Home machines • 1977", "›"],
+      "nintendo-game-watch": ["⌚", "🎮", "Handheld • 1980", "›"],
+      "nintendo-donkey-kong": ["🕹️", "🗓️", "Arcade game • 1981", "›"],
+      "eiffel-expands": ["🗼", "🌡️", "Iron expands in heat", "↕"],
+      "eiffel-tallest": ["🗼", "🏆", "Tallest for 42 years", "›"]
+    };
+
+    function subjectArt(item) {
       const themes = {
-        History: { icon: "◴", soft: "#fff4ce", accent: "#f2c658" },
-        Science: { icon: "⌁", soft: "#e5f0f7", accent: "#79a9d2" },
-        Space: { icon: "✦", soft: "#eee9f8", accent: "#afa2d7" },
-        Nature: { icon: "⌇", soft: "#e4f3ea", accent: "#69bc98" },
-        "The future": { icon: "↗", soft: "#fde9e4", accent: "#f39b8e" }
+        History: ["#fff4ce", "#f2c658"],
+        Science: ["#e5f0f7", "#79a9d2"],
+        Space: ["#eee9f8", "#afa2d7"],
+        Nature: ["#e4f3ea", "#69bc98"]
       };
-      const theme = themes[category] || themes.Science;
-      const shift = Math.min(step, 4) * 4;
-      return '<svg viewBox="0 0 320 200" fill="none" xmlns="http://www.w3.org/2000/svg">' +
-        '<circle cx="160" cy="99" r="64" fill="' + theme.soft + '" stroke="#17243d" stroke-width="4"/>' +
-        '<ellipse cx="160" cy="99" rx="116" ry="43" transform="rotate(' + (16 + shift) + ' 160 99)" stroke="' + theme.accent + '" stroke-width="4" stroke-dasharray="7 10"/>' +
-        '<circle cx="58" cy="71" r="8" fill="#f2c658"/><circle cx="268" cy="131" r="7" fill="#f39b8e"/>' +
-        '<path d="M46 133l5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2 5-10Z" fill="#fffdf8" stroke="#17243d" stroke-width="3" stroke-linejoin="round"/>' +
-        '<text x="160" y="119" text-anchor="middle" font-size="65" font-weight="800" fill="#17243d" font-family="Nunito, Arial, sans-serif">' + theme.icon + '</text>' +
-        '<path d="M245 38l4 8 9 1-7 6 2 9-8-4-8 4 2-9-7-6 9-1 4-8Z" fill="' + theme.accent + '"/>' +
-        '</svg>';
+      const spec = factVisuals[item.id] || ["✦", "🔎", item.category, "›"];
+      const theme = themes[item.category] || themes.Science;
+      return `
+        <div class="subject-visual" style="--visual-soft:${theme[0]};--visual-accent:${theme[1]}">
+          <div class="visual-pair">
+            <span class="visual-main">${spec[0]}</span>
+            <span class="visual-arrow">${spec[3]}</span>
+            <span class="visual-detail">${spec[1]}</span>
+          </div>
+          <span class="visual-cue">${spec[2]}</span>
+        </div>`;
     }
 
     function artForLesson(item, step = 0) {
       if (item.kind === "outlook") return outlookArt(step);
       if (item.id === "cleopatra") return historyArt(step);
-      return topicArt(item.category, step);
+      return subjectArt(item);
     }
 
     function fitCardToViewport(card) {
