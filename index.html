@@ -296,6 +296,31 @@
     .verified-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 3px rgba(105,188,152,.18); }
     .outlook .verified-dot { background: var(--sky); box-shadow: 0 0 0 3px rgba(159,193,223,.2); }
 
+    .evidence-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin: 10px 1px 0;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+    .evidence-line::before {
+      content: "✓";
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: var(--navy);
+      background: rgba(255,253,248,.75);
+      border: 1px solid rgba(23,36,61,.08);
+      font-size: 9px;
+    }
+    .outlook .evidence-line::before { content: "↗"; }
+
     .heart {
       width: 38px;
       height: 38px;
@@ -621,11 +646,17 @@
     .sheet-handle { width:42px; height:5px; border-radius:5px; background:rgba(23,36,61,.16); margin:0 auto 17px; }
     .sheet h3 { margin:0 0 6px; font-size:23px; letter-spacing:-.8px; }
     .sheet > p { margin:0 0 15px; color:var(--muted); font-size:12px; line-height:1.45; }
+    .trust-overview { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin:0 0 15px; }
+    .trust-detail { padding:12px; border-radius:16px; background:var(--ivory); border:1px solid var(--line); }
+    .trust-detail.wide { grid-column:1 / -1; }
+    .trust-detail span { display:block; margin-bottom:4px; color:var(--muted); font-size:9px; font-weight:950; letter-spacing:.65px; text-transform:uppercase; }
+    .trust-detail strong { display:block; font-size:12px; line-height:1.35; }
     .source-list { display:grid; gap:9px; }
     .source-link { display:block; padding:13px; border-radius:16px; background:var(--ivory); border:1px solid var(--line); text-decoration:none; color:var(--navy); }
     .source-link strong { display:block; font-size:13px; margin-bottom:3px; }
     .source-link span { color:var(--muted); font-size:11px; }
     .sheet .close-sheet { margin-top:13px; }
+    .report-link { display:block; padding:12px; text-align:center; color:var(--muted); font-size:11px; font-weight:850; text-decoration:none; }
 
     .toast {
       position:absolute; z-index:80; left:50%; bottom:92px; min-width:210px; padding:12px 16px; border-radius:15px;
@@ -693,6 +724,7 @@
       .swipe-hint.lesson-swipe { margin:clamp(4px, .8dvh, 10px) 0; }
       .text-link { padding:clamp(7px, 1.2dvh, 11px); }
       .fact-card.fit-compact .hero-art { flex-basis:88px; min-height:88px; max-height:88px; }
+      .fact-card.fit-compact .evidence-line { margin-top:5px; font-size:9px; }
       .fact-card.fit-compact .visual-main, .lesson-card.fit-compact .visual-main { font-size:46px; }
       .fact-card.fit-compact .visual-detail, .lesson-card.fit-compact .visual-detail { font-size:29px; }
       .fact-card.fit-compact h3 { font-size:18px; line-height:1.06; }
@@ -703,6 +735,7 @@
       .fact-card.fit-tight .visual-detail, .lesson-card.fit-tight .visual-detail { font-size:23px; }
       .fact-card.fit-tight .visual-cue, .lesson-card.fit-tight .visual-cue { font-size:7px; padding:3px 7px; }
       .fact-card.fit-tight .meta { display:none; }
+      .fact-card.fit-tight .evidence-line { display:none; }
       .fact-card.fit-tight { padding:12px; }
       .lesson-card.fit-compact .lesson-art { flex-basis:95px; min-height:95px; max-height:95px; }
       .lesson-card.fit-compact .lesson-copy { padding:7px 4px 5px; }
@@ -721,6 +754,14 @@
       .answers { gap:clamp(7px, 1.2dvh, 12px); }
       .answer { min-height:clamp(47px, 7dvh, 62px); padding:10px 15px; }
       .feedback { min-height:0; margin:clamp(7px, 1.2dvh, 14px) 0; padding:10px 13px; }
+      .quiz-wrap.fit-compact .quiz-icon { width:42px; height:42px; margin-bottom:5px; font-size:24px; }
+      .quiz-wrap.fit-compact h2 { font-size:19px; margin-bottom:4px; }
+      .quiz-wrap.fit-compact > p { font-size:11.5px; line-height:1.3; margin-bottom:7px; }
+      .quiz-wrap.fit-compact .answers { gap:6px; }
+      .quiz-wrap.fit-compact .answer { min-height:42px; padding:8px 11px; font-size:11px; line-height:1.25; }
+      .quiz-wrap.fit-compact .feedback { font-size:11px; line-height:1.3; margin:6px 0; padding:8px 10px; }
+      .quiz-wrap.fit-tight .quiz-icon { display:none; }
+      .quiz-wrap.fit-tight .answer { min-height:38px; font-size:10px; }
 
       .complete { flex:1 1 auto; min-height:0; margin:0; padding:clamp(14px, 2.4dvh, 24px); overflow:hidden; }
       .celebrate { height:clamp(105px, 24dvh, 190px); }
@@ -805,6 +846,7 @@
                 <span class="tag"><span class="verified-dot"></span><span id="cardTag">History · Verified</span></span>
                 <button class="heart" id="saveButton" aria-label="Save this lesson">♡</button>
               </div>
+              <div class="evidence-line" id="evidenceLine">Named sources · reviewed July 2026</div>
               <div class="hero-art" id="heroArt" aria-hidden="true"></div>
               <h3 id="cardTitle"></h3>
               <p id="cardSummary"></p>
@@ -821,7 +863,7 @@
         <section class="screen lesson-screen" id="lessonScreen" aria-label="Lesson">
           <div class="lesson-top">
             <button class="icon-button" id="backButton" aria-label="Back">←</button>
-            <div class="lesson-count" id="lessonCount">1 of 5</div>
+            <div class="lesson-count" id="lessonCount">1 of 3</div>
             <button class="icon-button" id="sourceButton" aria-label="View sources">ⓘ</button>
           </div>
           <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
@@ -865,10 +907,11 @@
               <div class="circle"><span class="big-five">5</span></div>
             </div>
             <h2>Five minutes well spent.</h2>
-            <p>You’ve finished this little piece of the world.</p>
+            <p>You learned one worthwhile idea. You can finish here — no streak pressure and no endless feed.</p>
             <div class="knowledge-recap"><span>You now know</span><strong id="recapText"></strong></div>
-            <button class="primary" id="anotherButton">Learn something else</button>
-            <button class="secondary" id="reviewSources">Review the sources</button>
+            <button class="primary" id="doneButton">Done for now</button>
+            <button class="secondary" id="anotherButton">Learn one more</button>
+            <button class="text-link" id="reviewSources">Review the evidence</button>
           </div>
         </section>
 
@@ -913,9 +956,11 @@
         <div class="sheet-backdrop" id="sourceSheet" role="dialog" aria-modal="true" aria-label="Sources">
           <div class="sheet">
             <div class="sheet-handle"></div>
-            <h3>Sources and certainty</h3>
+            <h3>Why you can trust this</h3>
             <p id="sourceSummary"></p>
+            <div class="trust-overview" id="trustOverview"></div>
             <div class="source-list" id="sourceList"></div>
+            <a class="report-link" id="reportIssue" href="#" target="_blank" rel="noopener">Something looks wrong? Report it ↗</a>
             <button class="secondary close-sheet" id="closeSheet">Close</button>
           </div>
         </div>
@@ -937,7 +982,7 @@
           simple: "It sounds impossible, but accepted dates put Cleopatra nearer to Apollo 11.",
           standard: "Using accepted historical dates, the gap from Cleopatra to Apollo 11 is roughly 500 years shorter."
         },
-        meta: ["5 minutes", "5 cards", "Reviewed Jul 2026"],
+        meta: ["5 minutes", "3 cards", "Reviewed Jul 2026"],
         recap: "Cleopatra was separated from Apollo 11 by roughly 2,000 years, but from the Great Pyramid by roughly 2,500 years.",
         sourceNote: "Confirmed historical comparison. Ancient dates are approximate, so the lesson uses rounded gaps rather than pretending to know an exact day.",
         sources: [
@@ -947,31 +992,19 @@
         ],
         slides: [
           {
-            eyebrow: "The surprising answer",
-            title: "Yes — it really is true.",
-            simple: "The Great Pyramid was already more than 2,500 years old when Cleopatra ruled Egypt.",
+            eyebrow: "Card 1 · The surprise",
+            title: "The pyramid was already ancient.",
+            simple: "The Great Pyramid was more than 2,500 years old when Cleopatra ruled Egypt.",
             standard: "The Great Pyramid belongs to Khufu’s reign, around 2551–2528 BC. Cleopatra VII ruled Egypt from 51 to 30 BC — over two and a half millennia later."
           },
           {
-            eyebrow: "First: the pyramid",
-            title: "Go back to about 2550 BC.",
-            simple: "The Great Pyramid was built for the pharaoh Khufu at Giza.",
-            standard: "The Great Pyramid at Giza was built during the reign of Khufu, which The Met dates to about 2551–2528 BC. Ancient dates are estimates, not timestamps."
+            eyebrow: "Card 2 · The explanation",
+            title: "Cleopatra came much later.",
+            simple: "She ruled from 51 to 30 BC. The pyramids belonged to a much earlier age of Egypt.",
+            standard: "Cleopatra VII was born in 70 or 69 BC and ruled from 51 to 30 BC. Ancient dates are estimates, but the roughly 2,500-year gap is clear."
           },
           {
-            eyebrow: "Then: Cleopatra",
-            title: "Now jump forward 2,500 years.",
-            simple: "Cleopatra VII was Egypt’s last queen. She ruled from 51 to 30 BC.",
-            standard: "Cleopatra VII was born in 70 or 69 BC and ruled from 51 to 30 BC. The pyramids were already ancient history in her lifetime."
-          },
-          {
-            eyebrow: "Then: the Moon",
-            title: "Apollo 11 landed in 1969.",
-            simple: "Neil Armstrong and Buzz Aldrin landed on the Moon on 20 July 1969.",
-            standard: "NASA’s Apollo 11 mission made humanity’s first crewed Moon landing on 20 July 1969. Armstrong and Aldrin walked on the surface while Michael Collins remained in lunar orbit."
-          },
-          {
-            eyebrow: "Put the gaps side by side",
+            eyebrow: "Card 3 · Keep this",
             title: "About 2,500 years versus 2,000.",
             simple: "Pyramid to Cleopatra: about 2,500 years. Cleopatra to Apollo 11: about 2,000 years.",
             standard: "Rounded to sensible historical precision, the Great Pyramid preceded Cleopatra by roughly 2,500 years; Apollo 11 followed her by roughly 2,000. That makes the Moon landing closer."
@@ -994,7 +1027,7 @@
           simple: "Scientists project a likely rise — but they give a range, not an exact promise.",
           standard: "IPCC scenarios give a likely global rise of roughly 15–29 cm by 2050, compared with 1995–2014."
         },
-        meta: ["5 minutes", "Projection", "Reviewed Jul 2026"],
+        meta: ["5 minutes", "3 cards", "Reviewed Jul 2026"],
         recap: "The best evidence gives a likely range for 2050, not one certain number — and local changes will differ from the global average.",
         sourceNote: "Evidence-based outlook, not a confirmed future fact. The figures are IPCC likely ranges and can be updated when new assessments are published.",
         sources: [
@@ -1004,31 +1037,19 @@
         ],
         slides: [
           {
-            eyebrow: "Outlook, not fact",
-            title: "The future comes as a range.",
-            simple: "Scientists cannot give one exact number. They test different possible futures.",
-            standard: "A projection describes what is likely under stated assumptions. It is not a promise or a single inevitable outcome."
-          },
-          {
-            eyebrow: "The likely range",
+            eyebrow: "Card 1 · The outlook",
             title: "Roughly 15 to 29 centimetres by 2050.",
             simple: "That is the likely global rise compared with the average level from 1995–2014.",
             standard: "Across the IPCC’s very low to very high emissions scenarios, the likely global mean rise by 2050 spans about 0.15–0.29 metres relative to 1995–2014."
           },
           {
-            eyebrow: "Why seas rise",
+            eyebrow: "Card 2 · The explanation",
             title: "Warmer water expands, and land ice melts.",
             simple: "Heat makes ocean water take up more space. Melting glaciers and ice sheets add water too.",
-            standard: "Ocean warming causes thermal expansion, while melting glaciers and ice sheets transfer water from land to ocean. Both raise global mean sea level."
+            standard: "Ocean warming causes thermal expansion, while melting glaciers and ice sheets transfer water from land to ocean. Local sea level also depends on land movement and ocean circulation."
           },
           {
-            eyebrow: "Global is not local",
-            title: "Your coastline may see a different amount.",
-            simple: "Land can rise or sink, and oceans do not change evenly everywhere.",
-            standard: "Local sea level also depends on land movement, ocean circulation, gravity and regional climate patterns, so a global average is not a local forecast."
-          },
-          {
-            eyebrow: "What we can honestly say",
+            eyebrow: "Card 3 · Keep this",
             title: "The direction is clear; the exact amount is not.",
             simple: "Sea level is expected to keep rising. The exact change depends on place, time and future emissions.",
             standard: "Continued rise is well supported. The precise amount at a particular coast remains conditional on emissions, ice-sheet behaviour and regional factors."
@@ -1179,41 +1200,80 @@
       { id:"future-sun-white-dwarf", category:"The future", title:"The Sun will eventually end as a white dwarf.", simple:"After its red-giant stage, it will shed its outer layers and leave a dense core.", detail:"NASA describes the Sun becoming a white dwarf in about ten billion years, after its red-giant phase and the loss of its outer atmosphere.", why:"A white dwarf makes no new heat by fusion and cools gradually. The timescale is approximate because stellar evolution is modelled over immense spans.", source:"NASA — Star Types", url:"https://science.nasa.gov/universe/stars/types/" }
     ];
 
+    function shortExplanation(text) {
+      const firstSentence = (text.match(/^.*?[.!?](?:\s|$)/) || [text])[0].trim();
+      return firstSentence.length > 105 ? firstSentence.slice(0, 102).trimEnd() + "…" : firstSentence;
+    }
+
+    function stableNumber(value) {
+      return [...value].reduce((total, character) => ((total * 31) + character.charCodeAt(0)) >>> 0, 7);
+    }
+
+    function understandingQuiz(fact) {
+      const alternatives = quickFacts.filter(other => other.id !== fact.id && other.category === fact.category);
+      const fallback = quickFacts.filter(other => other.id !== fact.id);
+      const pool = alternatives.length >= 2 ? alternatives : fallback;
+      const seed = stableNumber(fact.id);
+      const first = pool[seed % pool.length];
+      const remaining = pool.filter(other => other.id !== first.id);
+      const second = remaining[Math.floor(seed / 7) % remaining.length];
+      const correctText = shortExplanation(fact.why);
+      const choices = [correctText, shortExplanation(first.why), shortExplanation(second.why)];
+      const offset = seed % choices.length;
+      const answers = choices.slice(offset).concat(choices.slice(0, offset));
+      return {
+        question: `${fact.category === "The future" ? "Which condition or uncertainty matters for" : "Which explanation best supports"} “${fact.title}”?`,
+        answers,
+        correct: answers.indexOf(correctText),
+        feedback: "That’s it — " + fact.why
+      };
+    }
+
     function makeQuickLesson(fact) {
       const isOutlook = fact.category === "The future";
+      const isCalculated = ["future-apophis", "future-venus-transit"].includes(fact.id);
       return {
         id: fact.id,
         kind: isOutlook ? "outlook" : "fact",
         category: fact.category,
-        tag: isOutlook ? "Outlook · Evidence-based" : fact.category + " · Verified",
+        tag: isOutlook ? (isCalculated ? "Future · Calculated" : "Forecast · Conditional") : fact.category + " · Verified",
         title: fact.title,
         summary: { simple: fact.simple, standard: fact.detail },
-        meta: ["5 minutes", isOutlook ? "Projection" : "3 cards", "Reviewed Jul 2026"],
+        meta: ["5 minutes", "3 cards", "Reviewed Jul 2026"],
         recap: fact.detail,
         sourceNote: isOutlook
           ? "Evidence-based outlook. Conditions, ranges and uncertainty are kept visible so a projection is never presented as a guaranteed outcome."
           : "This concise lesson stays within what the named source supports and avoids presenting an estimate as an exact measurement.",
         sources: [{ name: fact.source, note: fact.detail, url: fact.url }],
         slides: [
-          { eyebrow: "The quick fact", title: fact.title, simple: fact.simple, standard: fact.detail },
-          { eyebrow: "Why it makes sense", title: "Here’s the useful bit.", simple: fact.why, standard: fact.why },
-          { eyebrow: "Keep this one", title: "Now you can explain it.", simple: fact.detail, standard: fact.detail }
+          { eyebrow: `Card 1 · ${isOutlook ? "The outlook" : "The surprise"}`, title: fact.title, simple: fact.simple, standard: fact.detail },
+          { eyebrow: "Card 2 · The explanation", title: "Here’s the useful bit.", simple: fact.why, standard: fact.why },
+          { eyebrow: "Card 3 · Keep this", title: "Now you can explain it.", simple: fact.detail, standard: fact.detail }
         ],
-        quiz: {
-          question: "Which statement matches the source?",
-          answers: [fact.title, "The source says the exact opposite.", "There is no evidence for either option."],
-          correct: 0,
-          feedback: "Correct — " + fact.detail
-        }
+        quiz: understandingQuiz(fact)
       };
     }
 
     lessons.push(...quickFacts.map(makeQuickLesson));
 
-    let currentLessonIndex = Math.floor(Math.random() * lessons.length);
+    function loadStoredSet(key) {
+      try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); }
+      catch (error) { return new Set(); }
+    }
+
+    function storeSet(key, value) {
+      try { localStorage.setItem(key, JSON.stringify([...value])); }
+      catch (error) { /* The app still works when private browsing blocks storage. */ }
+    }
+
+    let saved = loadStoredSet("new-in-5-saved");
+    let seen = loadStoredSet("new-in-5-seen");
+    const freshOnLaunch = lessons.map((item, index) => ({ item, index })).filter(({ item }) => !seen.has(item.id));
+    let currentLessonIndex = freshOnLaunch.length
+      ? freshOnLaunch[Math.floor(Math.random() * freshOnLaunch.length)].index
+      : Math.floor(Math.random() * lessons.length);
     let slideIndex = 0;
     let readingMode = "simple";
-    let saved = new Set();
     let answered = false;
     let motionLocked = false;
     let activeSubject = "Surprise";
@@ -1416,6 +1476,24 @@
       return subjectArt(item);
     }
 
+    function trustDetails(item) {
+      if (item.kind !== "outlook") {
+        return {
+          status: "Verified fact",
+          certainty: "High · supported by the named source",
+          reviewed: "July 2026",
+          caveat: item.sourceNote
+        };
+      }
+      const calculatedEvent = ["future-apophis", "future-venus-transit"].includes(item.id);
+      return {
+        status: calculatedEvent ? "Calculated future event" : "Evidence-based outlook",
+        certainty: calculatedEvent ? "High · orbit calculations" : "Conditional · assumptions can change",
+        reviewed: "July 2026",
+        caveat: item.sourceNote
+      };
+    }
+
     function fitCardToViewport(card) {
       if (!card) return;
       card.classList.remove("fit-compact", "fit-tight");
@@ -1427,6 +1505,18 @@
       });
     }
 
+    function fitQuizToViewport() {
+      const wrap = document.querySelector(".quiz-wrap");
+      if (!wrap) return;
+      wrap.classList.remove("fit-compact", "fit-tight");
+      requestAnimationFrame(() => {
+        if (wrap.scrollHeight > wrap.clientHeight + 1) wrap.classList.add("fit-compact");
+        requestAnimationFrame(() => {
+          if (wrap.scrollHeight > wrap.clientHeight + 1) wrap.classList.add("fit-tight");
+        });
+      });
+    }
+
     function renderHome() {
       const item = lesson();
       const isOutlook = item.kind === "outlook";
@@ -1434,13 +1524,19 @@
       $("cardTag").textContent = item.tag;
       $("cardTitle").textContent = item.title;
       $("cardSummary").textContent = item.summary[readingMode];
-      $("cardMeta").innerHTML = item.meta.map(m => `<span>${m}</span>`).join("");
+      const cardMeta = item.meta.filter(value => !value.startsWith("Reviewed"));
+      cardMeta.push(seen.has(item.id) ? "Seen" : "New");
+      $("cardMeta").innerHTML = cardMeta.map(m => `<span>${m}</span>`).join("");
       $("heroArt").innerHTML = artForLesson(item, 1);
+      $("evidenceLine").textContent = isOutlook
+        ? "Assumptions shown · reviewed July 2026"
+        : `${item.sources.length} named source${item.sources.length === 1 ? "" : "s"} · reviewed July 2026`;
       $("homeGreeting").textContent = isOutlook ? "Here’s what the evidence suggests." : "Here’s something surprising from " + item.category.toLowerCase() + ".";
       $("saveButton").textContent = saved.has(item.id) ? "♥" : "♡";
       $("saveButton").classList.toggle("saved", saved.has(item.id));
       $("modeName").textContent = titleCase(readingMode);
-      $("surpriseButton").textContent = "or tap to shuffle · " + lessons.length + " ideas";
+      const remaining = lessonPool(activeSubject).filter(index => !seen.has(lessons[index].id)).length;
+      $("surpriseButton").textContent = `or tap to shuffle · ${remaining || lessonPool(activeSubject).length} ${remaining ? "new" : "ideas"}`;
       document.querySelectorAll(".mode-label").forEach(e => e.textContent = titleCase(readingMode));
       document.querySelectorAll(".subject-chip").forEach(button => {
         const active = button.dataset.subject === activeSubject;
@@ -1473,15 +1569,24 @@
       $("finishButton").disabled = true;
       $("finishButton").style.opacity = ".45";
       $("answerList").innerHTML = q.answers.map((answer, i) => `<button class="answer" data-answer="${i}">${answer}</button>`).join("");
+      fitQuizToViewport();
     }
 
     function renderSources() {
       const item = lesson();
-      $("sourceSummary").textContent = `${item.sourceNote} Last editorial review: July 2026.`;
+      const trust = trustDetails(item);
+      $("sourceSummary").textContent = "The claim, its uncertainty and the supporting evidence are kept separate.";
+      $("trustOverview").innerHTML = `
+        <div class="trust-detail"><span>Status</span><strong>${trust.status}</strong></div>
+        <div class="trust-detail"><span>Certainty</span><strong>${trust.certainty}</strong></div>
+        <div class="trust-detail"><span>Last reviewed</span><strong>${trust.reviewed}</strong></div>
+        <div class="trust-detail"><span>Sources</span><strong>${item.sources.length} named source${item.sources.length === 1 ? "" : "s"}</strong></div>
+        <div class="trust-detail wide"><span>${item.kind === "outlook" ? "What could change" : "Editorial note"}</span><strong>${trust.caveat}</strong></div>`;
       $("sourceList").innerHTML = item.sources.map(source => `
         <a class="source-link" href="${source.url}" target="_blank" rel="noopener">
           <strong>${source.name} ↗</strong><span>${source.note}</span>
         </a>`).join("");
+      $("reportIssue").href = "https://github.com/rsteer21-Rae/new-in-5/issues/new?title=" + encodeURIComponent("Fact check: " + item.title) + "&body=" + encodeURIComponent("Lesson ID: " + item.id + "\n\nWhat looks wrong or unclear?\n");
     }
 
     function renderSaved() {
@@ -1582,10 +1687,21 @@
 
     function refillLessonDeck(subject = activeSubject) {
       const key = subject;
-      const deck = lessonPool(subject).filter(index => index !== currentLessonIndex);
-      for (let i = deck.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [deck[i], deck[j]] = [deck[j], deck[i]];
+      const shuffle = values => {
+        for (let i = values.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [values[i], values[j]] = [values[j], values[i]];
+        }
+        return values;
+      };
+      const pool = lessonPool(subject).filter(index => index !== currentLessonIndex);
+      const unseenDeck = shuffle(pool.filter(index => !seen.has(lessons[index].id)));
+      const seenDeck = shuffle(pool.filter(index => seen.has(lessons[index].id)));
+      const deck = [...unseenDeck, ...seenDeck];
+      if (!unseenDeck.length) {
+        // A completed deck becomes available again, while still avoiding adjacent topic repeats.
+        seenDeck.forEach(index => seen.delete(lessons[index].id));
+        storeSet("new-in-5-seen", seen);
       }
       lessonDecks.set(key, deck);
       return deck;
@@ -1596,12 +1712,18 @@
       if (!deck || !deck.length) deck = refillLessonDeck(activeSubject);
       if (!deck.length) return;
 
-      const currentFamily = topicFamily(lesson());
-      const differentTopicSlots = deck
-        .map((index, slot) => ({ index, slot }))
-        .filter(({ index }) => topicFamily(lessons[index]) !== currentFamily)
-        .map(({ slot }) => slot);
-      const eligibleSlots = differentTopicSlots.length ? differentTopicSlots : deck.map((_, slot) => slot);
+      const currentItem = lesson();
+      const currentFamily = topicFamily(currentItem);
+      let candidates = deck.map((index, slot) => ({ index, slot }));
+      const unseenCandidates = candidates.filter(({ index }) => !seen.has(lessons[index].id));
+      if (unseenCandidates.length) candidates = unseenCandidates;
+      if (activeSubject === "Surprise") {
+        const differentCategory = candidates.filter(({ index }) => lessons[index].category !== currentItem.category);
+        if (differentCategory.length) candidates = differentCategory;
+      }
+      const differentTopic = candidates.filter(({ index }) => topicFamily(lessons[index]) !== currentFamily);
+      if (differentTopic.length) candidates = differentTopic;
+      const eligibleSlots = candidates.map(({ slot }) => slot);
       const chosenSlot = eligibleSlots[Math.floor(Math.random() * eligibleSlots.length)];
       currentLessonIndex = deck.splice(chosenSlot, 1)[0];
     }
@@ -1704,13 +1826,20 @@
       card.addEventListener("pointercancel", finishSwipe);
     }
 
-    $("startButton").addEventListener("click", () => { slideIndex = 0; renderLesson(); showScreen("lessonScreen", false); });
+    $("startButton").addEventListener("click", () => {
+      seen.add(lesson().id);
+      storeSet("new-in-5-seen", seen);
+      slideIndex = 0;
+      renderLesson();
+      showScreen("lessonScreen", false);
+    });
     $("surpriseButton").addEventListener("click", () => cycleHomeCard(1));
     $("modeSwitch").addEventListener("click", toggleMode);
     document.querySelectorAll(".explore-mode").forEach(e => e.addEventListener("click", toggleMode));
     $("saveButton").addEventListener("click", () => {
       const id = lesson().id;
       if (saved.has(id)) { saved.delete(id); toast("Removed from saved"); } else { saved.add(id); toast("Saved for later"); }
+      storeSet("new-in-5-saved", saved);
       renderHome(); renderSaved();
     });
     $("backButton").addEventListener("click", () => cycleLessonCard(-1));
@@ -1735,8 +1864,10 @@
       $("feedback").classList.add("visible");
       $("finishButton").disabled = false;
       $("finishButton").style.opacity = "1";
+      fitQuizToViewport();
     });
     $("finishButton").addEventListener("click", () => { $("recapText").textContent = lesson().recap; showScreen("completeScreen", false); });
+    $("doneButton").addEventListener("click", () => { renderHome(); showScreen("homeScreen", true); toast("Five minutes well spent"); });
     $("anotherButton").addEventListener("click", () => { advanceLesson(1); renderHome(); showScreen("homeScreen", true); });
     document.querySelectorAll(".nav-item").forEach(item => item.addEventListener("click", () => { if (item.dataset.screen === "savedScreen") renderSaved(); showScreen(item.dataset.screen, true); }));
     document.querySelectorAll(".subject-chip[data-subject]").forEach(btn => btn.addEventListener("click", () => chooseSubject(btn.dataset.subject)));
@@ -1747,6 +1878,7 @@
     window.addEventListener("resize", () => {
       fitCardToViewport($("factCard"));
       fitCardToViewport($("lessonCard"));
+      fitQuizToViewport();
     });
 
     renderHome(); renderLesson(); renderSaved();
