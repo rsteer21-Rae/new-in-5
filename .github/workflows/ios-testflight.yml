@@ -2,6 +2,11 @@ name: Build iOS and upload to TestFlight
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/testflight-trigger"
 
 permissions:
   contents: read
