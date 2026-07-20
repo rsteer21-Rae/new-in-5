@@ -1,0 +1,62 @@
+name: Generate iPad App Store screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ipad-screenshots.yml"
+      - "scripts/capture-ipad-screenshots.js"
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install browser automation
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start New in 5 locally
+        run: |
+          python3 -m http.server 4173 > "$RUNNER_TEMP/new-in-5-server.log" 2>&1 &
+
+      - name: Capture 13-inch iPad screenshots
+        run: node scripts/capture-ipad-screenshots.js
+
+      - name: Verify Apple screenshot dimensions
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const files = fs.readdirSync("ipad-screenshots").filter(file => file.endsWith(".png")).sort();
+          if (files.length !== 5) throw new Error(`Expected 5 screenshots, found ${files.length}`);
+          for (const file of files) {
+            const png = fs.readFileSync(`ipad-screenshots/${file}`);
+            const width = png.readUInt32BE(16);
+            const height = png.readUInt32BE(20);
+            if (width !== 2064 || height !== 2752) throw new Error(`${file}: expected 2064x2752, got ${width}x${height}`);
+            console.log(`Verified ${file}: ${width}x${height}`);
+          }
+          NODE
+
+      - name: Upload iPad screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-in-5-ipad-app-store-screenshots
+          path: ipad-screenshots/*.png
+          if-no-files-found: error
+          retention-days: 14
