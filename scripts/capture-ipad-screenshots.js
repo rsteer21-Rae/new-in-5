@@ -1,6 +1,8 @@
 const { chromium } = require("playwright");
 const fs = require("fs");
 
+// Capture revision 2: tablet-optimised layout.
+
 const output = "ipad-screenshots";
 fs.mkdirSync(output, { recursive: true });
 

@@ -795,6 +795,65 @@
       .saved-empty { flex:1 1 auto; min-height:0; }
     }
 
+    @media (min-width: 700px) and (max-width: 1100px) {
+      .screen { --screen-gutter:max(32px, calc((100vw - 960px) / 2)); }
+      .bottom-nav { padding-left:max(44px, calc((100vw - 960px) / 2)); padding-right:max(44px, calc((100vw - 960px) / 2)); }
+      .topbar { min-height:58px; }
+      .mini-logo { font-size:30px; }
+      .mode-switch { padding:12px 19px; font-size:15px; }
+      .greeting h2 { font-size:36px; max-width:24ch; }
+      .greeting .kicker, .subject-picker-label { font-size:14px; }
+      .subject-chip { padding:11px 17px; font-size:14px; }
+
+      .fact-card { padding:28px; }
+      .hero-art { flex-basis:clamp(230px, 25dvh, 330px); min-height:230px; max-height:330px; }
+      .fact-card h3 { font-size:34px; line-height:1.08; }
+      .fact-card p { font-size:18px; line-height:1.48; }
+      .evidence-line { font-size:13px; }
+      .meta span { padding:9px 13px; font-size:13px; }
+      .primary, .secondary { min-height:60px; font-size:17px; }
+      .trust-note { font-size:13px; }
+
+      .lesson-card { padding:28px; }
+      .lesson-art { flex-basis:clamp(300px, 31dvh, 410px); min-height:300px; max-height:410px; }
+      .lesson-copy { padding:24px 8px 18px; }
+      .lesson-eyebrow { font-size:13px; }
+      .lesson-copy h2 { font-size:38px; line-height:1.08; }
+      .lesson-copy p { font-size:19px; line-height:1.5; }
+      .lesson-count { font-size:15px; }
+
+      .explore-title { font-size:42px; }
+      .explore-intro { font-size:18px; }
+      .category-grid { grid-template-columns:repeat(3, minmax(0, 1fr)); grid-template-rows:repeat(2, minmax(0, 1fr)); gap:18px; }
+      .category-card { padding:25px; }
+      .category-card .cat-icon { font-size:34px; margin-bottom:24px; }
+      .category-card strong { font-size:20px; }
+      .category-card small { font-size:15px; }
+
+      .quiz-wrap { display:flex; flex-direction:column; justify-content:center; padding:42px; }
+      .quiz-icon { width:90px; height:90px; font-size:42px; }
+      .quiz-wrap h2 { font-size:38px; }
+      .quiz-wrap > p { font-size:18px; }
+      .answer { min-height:72px; font-size:16px; }
+
+      .complete { display:flex; flex-direction:column; justify-content:center; padding:42px; }
+      .celebrate { height:270px; }
+      .celebrate .circle { width:190px; height:190px; }
+      .celebrate .big-five { font-size:82px; }
+      .complete h2 { font-size:42px; }
+      .complete > p { font-size:18px; max-width:42ch; }
+      .knowledge-recap { padding:24px; }
+      .knowledge-recap strong { font-size:18px; }
+
+      .sheet { left:50%; right:auto; width:min(960px, 100%); padding:18px 30px 34px; transform:translate(-50%, 102%); }
+      .sheet-backdrop.open .sheet { transform:translate(-50%, 0); }
+      .sheet h3 { font-size:30px; }
+      .sheet > p { font-size:15px; }
+      .trust-detail strong { font-size:15px; }
+      .source-link strong { font-size:16px; }
+      .source-link span { font-size:14px; }
+    }
+
     @media (max-width: 1100px) and (max-height: 680px) {
       .topbar { min-height:36px; }
       .mini-logo { font-size:20px; }
